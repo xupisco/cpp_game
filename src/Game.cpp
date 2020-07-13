@@ -1,21 +1,24 @@
 #include <iostream>
 
+#include "../lib/glm/glm.hpp"
+
 #include "./Constants.h"
+#include "./components/TransformComponent.h"
+
 #include "./Game.h"
+
+EntityManager manager;
+SDL_Renderer* Game::renderer;
 
 Game::Game() {
     this->isRunning = false;
 }
+
 Game::~Game() { }
 
 bool Game::IsRunning() const {
     return this->isRunning;
 }
-
-float px = 0.0f;
-float py = 0.0f;
-float velx = 0.05f;
-float vely = 0.05f;
 
 void Game::Initialize(int width, int height) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -41,8 +44,15 @@ void Game::Initialize(int width, int height) {
         return;
     }
     
+    LoadLevel(0);
+    
     isRunning = true;
     return;
+}
+
+void Game::LoadLevel(int levelNumber) {
+    Entity& newEntity(manager.AddEntity("projectile"));
+    newEntity.AddComponent<TransformComponent>(0, 0, 20, 20, 32, 32, 1);
 }
 
 void Game::ProcessInput() {
@@ -64,21 +74,28 @@ void Game::ProcessInput() {
 }
 
 void Game::Update() {
-    px += velx;
-    py += vely;
+    // FPS and time management
+    int timeToWait = FRAME_TARGET_TIME - (SDL_GetTicks() - ticksLastFrame);
+    if (timeToWait > 0 && timeToWait <= FRAME_TARGET_TIME) {
+        SDL_Delay(timeToWait);
+    }
+    
+    float deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
+    deltaTime = (deltaTime > 0.05f) ? 0.05f : deltaTime;
+    ticksLastFrame = SDL_GetTicks();
+    
+    manager.Update(deltaTime);
 }
 
 void Game::Render() {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
     
-    SDL_Rect p {
-        (int) px, (int) py,
-        10, 10
-    };
+    if (manager.HasNoEntities()) {
+        return;
+    }
     
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &p);
+    manager.Render();
     SDL_RenderPresent(renderer);
 }
 
