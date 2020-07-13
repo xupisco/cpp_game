@@ -6,6 +6,15 @@ void EntityManager::ClearData() {
     }
 }
 
+void EntityManager::ListEntities() {
+    if (!this->HasNoEntities()) {
+        for (auto& entity: entities) {
+            std::cout << entity->name << std::endl;
+            entity->ListCompoments();
+        }
+    }
+}
+
 bool EntityManager::HasNoEntities() {
     return entities.size() == 0;
 }

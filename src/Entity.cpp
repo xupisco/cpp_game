@@ -27,3 +27,11 @@ void Entity::Destroy() {
 bool Entity::IsActive() const {
     return this->isActive;
 }
+
+void Entity::ListCompoments() {
+    if (this->components.size() > 0) {
+        for (auto& component: components) {
+            std::cout << " - " << component->name << std::endl;
+        }
+    }
+}

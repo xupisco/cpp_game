@@ -8,6 +8,9 @@
 #include "./Entity.h"
 #include "./Component.h"
 #include "./EntityManager.h"
+#include "./AssetManager.h"
+
+class AssetManager;
 
 class Game {
     private:
@@ -27,6 +30,7 @@ class Game {
         void Destroy();
         
         static SDL_Renderer *renderer;
+        static AssetManager* assetManager;
         void LoadLevel(int levelNumber);
 };
 
